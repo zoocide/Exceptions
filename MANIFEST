@@ -4,3 +4,9 @@ MANIFEST
 README
 t/Exceptions.t
 lib/Exceptions.pm
+lib/Exceptions/Exception.pm
+lib/Exceptions/List.pm
+lib/Exceptions/TextError.pm
+lib/Exceptions/InternalError.pm
+lib/Exceptions/OpenFileError.pm
+lib/Exceptions/TextFileError.pm
