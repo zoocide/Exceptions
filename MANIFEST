@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Exceptions.t
+lib/Exceptions.pm
