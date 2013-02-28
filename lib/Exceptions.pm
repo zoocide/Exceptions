@@ -1,83 +1,179 @@
 package Exceptions;
-
 use 5.00008;
-use strict;
+use base qw(Exporter);
+use Exceptions::Exception;
+use Exceptions::List;
+our @EXPORT;
+@EXPORT = qw(try throw catch exception2string string2exception make_exlist);
 
-require Exporter;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-@ISA = qw(Exporter);
+our $VERSION = '0.3.0';
 
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
+=head1 Exceptions
 
-# This allows declaration	use Exceptions ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-%EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-@EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-@EXPORT = qw(
-	
-);
-
-$VERSION = '0.01';
-
-
-# Preloaded methods go here.
-
-1;
-__END__
-# Below is stub documentation for your module. You'd better edit it!
-
-=head1 NAME
-
-Exceptions - Perl extension for blah blah blah
+Another implementation of exceptions.
 
 =head1 SYNOPSIS
 
   use Exceptions;
-  blah blah blah
 
-=head1 DESCRIPTION
+  try {
+    ## do something ##
+    ...
+    # throw exception of 'Exceptions::Exception' type
+    throw Exception => "message";
+    ...
+    # throw exception of 'Exceptions::MyException' type
+    throw MyException => $arg1, $arg2, $arg3;
+  }
+  catch {
+    ## catch exception of 'Exceptions::MyException' type ##
+  } 'Exceptions::MyException',
+  catch {
+    ## catch exception of 'Exceptions::Exception' type ##
+    my $msg = $_[0]->msg;    ##< obtain message from exception
+  } 'Exceptions::Exception',
+  catch {
+    ## catch all exceptions ##
+  };
 
-Stub documentation for Exceptions, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+  try{
+    ## do something ##
+  }
+  exception2string   ##< convert Exceptions::Exception object to string exception.
+  catch{
+    print $_[0];     ##< all exceptions prints normally
+  };
 
-Blah blah blah.
+=cut
 
-=head2 EXPORT
+sub throw
+{
+  die $@  if !@_;
+  die $_[0] if ref $_[0];
+  die +('Exceptions::'.(shift))->new(@_);
+}
 
-None by default.
+sub try (&;$)
+{
+  my $ret = eval { &{$_[0]} };
+  if ($@){
+    my $arr = $_[1];
+    if ($arr){
+      while (@$arr){
+        my ($t, $s) = @{ shift @$arr };
+        if (!defined $t){
+          &$s($@);
+          next;
+        }
+        return &$s($@) if (!$t || (ref $@ && $@->isa($t)));
+      }
+    }
+    die $@;
+  }
+  $ret
+}
 
+sub catch (&;$;$)
+{
+  my $type = ($_[1] && !ref $_[1]) ? $_[1] : '';
+  my $ret  = ref $_[1] ? $_[1] : (ref $_[2] ? $_[2] : []);
 
+  unshift @$ret, [$type, $_[0]];
+  $ret
+}
 
-=head1 SEE ALSO
+sub exception2string (;$)
+{
+  my $ret = ref $_[0] ? $_[0] : [];
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
+  my $s = sub {
+    if ($_[0] && (ref $@ && $@->isa('Exceptions::Exception'))){
+      $_[0] = $_[0]->msg."\n";
+    }
+  };
+  unshift @$ret, [undef, $s];
+  $ret
+}
 
-If you have a mailing list set up for your module, mention it here.
+sub string2exception (;$)
+{
+  my $ret = ref $_[0] ? $_[0] : [];
 
-If you have a web site set up for your module, mention it here.
+  my $s = sub {
+    if (!ref $_[0]){
+      chomp($_[0]);
+      $_[0] = Exceptions::Exception->new($_[0]);
+    }
+  };
+  unshift @$ret, [undef, $s];
+  $ret
+}
+
+sub make_exlist (;$)
+{
+  my $ret = ref $_[0] ? $_[0] : [];
+
+  my $s = sub {
+    return if (ref $_[0] && $_[0]->isa('Exceptions::List'));
+    $_[0] = Exceptions::List->new($_[0]);
+  };
+  unshift @$ret, [undef, $s];
+  $ret
+}
+
+1;
+__END__
+
+=head1 METHODS
+
+=over
+
+=item try(&;$)
+
+'try' executes the block. When exception raised in the block:
+If exists 'catch' with suitable argument it is used. Otherwise exception will be forwarded.
+
+=item throw
+
+  throw; - forward exception.
+  throw 'Exception' => @arguments; - raise new exception object.
+  throw $exc_obj; - raise existing exception object.
+
+=item catch
+
+Use it only as exception processor.
+  catch {}; - catch exception of any type including string exceptions.
+  catch {} 'Exceptions::MyException'; - catch only exception of 'Exceptions::MyException' type.
+
+=item exception2string
+
+Use it only as exception processor.
+Converts any 'Exceptions::Exception' object to string exception.
+
+=item string2exception
+
+Use it only as exception processor.
+Converts any exception string to exception object 'Exceptions::Exception'.
+
+=make_exlist
+
+Use it only as exception processor.
+If exception is not of type 'Exceptions::List' then create new 'Exceptions::List' contained caught exception.
+
+=back
+
+=head1 EXPORT
+
+  try
+  throw
+  catch
+  exception2string
+  string2exception
+  make_exlist
 
 =head1 AUTHOR
 
-Alexander, E<lt>zoocide@(none)E<gt>
-
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2013 by Alexander
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
-
+  Alexander Smirnov E<lt>zoocide@gmail.comE<gt>
 
 =cut
+

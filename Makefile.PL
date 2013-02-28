@@ -8,5 +8,5 @@ WriteMakefile(
     PREREQ_PM         => {'Test'        =>  0, }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Exceptions.pm', # retrieve abstract from module
-       AUTHOR         => 'Alexander <zoocide@(none)>') : ()),
+       AUTHOR         => 'Alexander Smirnov <zoocide@gmail.com>') : ()),
 );
