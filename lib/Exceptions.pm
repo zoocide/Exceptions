@@ -8,7 +8,11 @@ our @EXPORT;
 
 our $VERSION = '0.3.0';
 
-=head1 Exceptions
+=head1 NAME
+
+Exceptions
+
+=head1 ABSTRACT
 
 Another implementation of exceptions.
 
@@ -173,7 +177,7 @@ If exception is not of type 'Exceptions::List' then create new 'Exceptions::List
 
 =head1 AUTHOR
 
-  Alexander Smirnov E<lt>zoocide@gmail.comE<gt>
+  Alexander Smirnov <zoocide@gmail.com>
 
 =cut
 
