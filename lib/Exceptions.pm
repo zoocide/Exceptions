@@ -62,6 +62,7 @@ sub try (&;$)
   my $ret = eval { &{$_[0]} };
   if ($@){
     my $arr = $_[1];
+    my $ret_sub;
     if ($arr){
       while (@$arr){
         my ($t, $s) = @{ shift @$arr };
@@ -69,8 +70,9 @@ sub try (&;$)
           &$s($@);
           next;
         }
-        return &$s($@) if (!$t || (ref $@ && $@->isa($t)));
+        $ret_sub = $s, last if (!$t || (ref $@ && $@->isa($t)));
       }
+      return &$ret_sub($@) if $ret_sub;
     }
     die $@;
   }
