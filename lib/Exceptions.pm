@@ -6,7 +6,7 @@ use Exceptions::List;
 our @EXPORT;
 @EXPORT = qw(try throw catch exception2string string2exception make_exlist);
 
-our $VERSION = '0.3.0';
+our $VERSION = '0.3.1';
 
 =head1 NAME
 
@@ -60,21 +60,25 @@ sub throw
 sub try (&;$)
 {
   my $ret = eval { &{$_[0]} };
-  if ($@){
-    my $arr = $_[1];
+  if (my $e = $@){
+    my $arr = $_[1]; #< 'catch' or other subroutines
     my $ret_sub;
     if ($arr){
+      # $arr = [ [$type, $subroutine], ...]
       while (@$arr){
         my ($t, $s) = @{ shift @$arr };
-        if (!defined $t){
-          &$s($@);
+        if (!defined $t){ # for modification subroutines $type = undef
+          &$s($e);
           next;
         }
-        $ret_sub = $s, last if (!$t || (ref $@ && $@->isa($t)));
+        $ret_sub = $s, last if (!$t || eval{ref $e && $e->isa($t)});
       }
-      return &$ret_sub($@) if $ret_sub;
+      if ($ret_sub){
+        $@ = $e;
+        return &$ret_sub($e);
+      }
     }
-    die $@;
+    die $e;
   }
   $ret
 }
@@ -93,7 +97,7 @@ sub exception2string (;$)
   my $ret = ref $_[0] ? $_[0] : [];
 
   my $s = sub {
-    if ($_[0] && (ref $@ && $@->isa('Exceptions::Exception'))){
+    if ($_[0] && eval{ref $_[0] && $_[0]->isa('Exceptions::Exception')}){
       $_[0] = $_[0]->msg."\n";
     }
   };
@@ -120,7 +124,7 @@ sub make_exlist (;$)
   my $ret = ref $_[0] ? $_[0] : [];
 
   my $s = sub {
-    return if (ref $_[0] && $_[0]->isa('Exceptions::List'));
+    return if eval{ref $_[0] && $_[0]->isa('Exceptions::List')};
     $_[0] = Exceptions::List->new($_[0]);
   };
   unshift @$ret, [undef, $s];
@@ -141,7 +145,7 @@ If exists 'catch' with suitable argument it is used. Otherwise exception will be
 
 =item throw
 
-  throw; - forward exception.
+  DEPRECATED: throw; - forward exception.
   throw 'Exception' => @arguments; - raise new exception object.
   throw $exc_obj; - raise existing exception object.
 
