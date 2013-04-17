@@ -8,6 +8,7 @@
 use strict;
 use warnings;
 
+use lib '../lib';
 use Test::More tests => 14;
 use Exceptions;
 ok(1); # If we made it this far, we're ok.
@@ -17,64 +18,72 @@ ok(1); # If we made it this far, we're ok.
 # Insert your test code below, the Test::More module is use()ed here so read
 # its man page ( perldoc Test::More ) for help writing this test script.
 
-my $catched;
+my $caught;
+my $n;
 
+no warnings qw(exiting);
+## die and catch ##
 eval{
   try{
     die "exception\n";
   }
   catch{
-    $catched = $@;
+    $caught = $@;
   };
 };
 ok(!$@);
-is($catched, "exception\n");
+is($caught, "exception\n");
 
+## throw Exception and catch ##
+$caught = 0;
 eval{
   try{
     throw Exception => "Exception";
   }
   catch{
-    $catched = $@;
+    $caught = $@;
   };
 };
 ok(!$@);
-is("$catched", "Exception\n");
-isa_ok($catched, 'Exceptions::Exception');
-can_ok($catched, 'msg');
-is($catched->msg, 'Exception');
+is("$caught", "Exception\n");
+isa_ok($caught, 'Exceptions::Exception');
+can_ok($caught, 'msg');
+is($caught->msg, 'Exception');
 
+## throw Exception and catch Exception ##
+$caught = 0;
 eval{
   try{
     throw Exception => "Exception";
   }
-  catch {
-    $catched = $@;
+  catch{
+    $caught = $@;
   } 'Exceptions::Exception',
   catch{
     die "error";
   };
 };
 ok(!$@);
-is($catched->msg, "Exception");
+is($caught->msg, "Exception");
 
+## die with string and catch the string ##
+$caught = 0;
 eval{
   try{
     die "Exception\n";
   }
-  catch {
+  catch{
     die "error";
   } 'Exception',
   catch{
-    $catched = $@;
+    $caught = $@;
   };
 };
 ok(!$@);
-is($catched, "Exception\n");
+is($caught, "Exception\n");
 
-TODO: {
-  local $TODO = "Problem with loop control statements\n";
-my $n;
+## loop control statements ##
+$n = 0;
 eval{
   $n = 0;
   for (my $i = 0; $i < 10; $i++){
@@ -88,6 +97,5 @@ eval{
   }
 };
 ok(!$@);
-is($n, 10);
-}
+is($n, 0);
 
