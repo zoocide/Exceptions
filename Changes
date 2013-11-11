@@ -1,2 +1,4 @@
 Revision history for Perl extension Exceptions.
 
+0.3.2:
+- "catch {} 'Exception'" instead of "catch {} 'Exceptions::Exception'"
