@@ -10,7 +10,7 @@ use warnings;
 
 use lib '../lib';
 use Test::More tests => 25;
-use Exceptions;
+use Exceptions::Functions;
 ok(1); # If we made it this far, we're ok.
 
 #########################

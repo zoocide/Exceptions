@@ -1,4 +1,4 @@
-package Exceptions;
+package Exceptions::Functions;
 use 5.00008;
 use base qw(Exporter);
 use Exceptions::Exception;
@@ -7,7 +7,7 @@ use Carp;
 our @EXPORT;
 @EXPORT = qw(try throw catch exception2string string2exception make_exlist);
 
-our $VERSION = '0.3.2';
+our $VERSION = '0.4.0';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ Exceptions - Another implementation of exceptions.
 
 =head1 SYNOPSIS
 
-  use Exceptions;
+  use Exceptions::Functions;
 
   #------------------#
   try{

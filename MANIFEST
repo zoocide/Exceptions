@@ -4,7 +4,7 @@ MANIFEST
 README
 t/Exceptions.t
 t/Exceptions-2.t
-lib/Exceptions.pm
+lib/Exceptions/Functions.pm
 lib/Exceptions/Exception.pm
 lib/Exceptions/List.pm
 lib/Exceptions/TextError.pm

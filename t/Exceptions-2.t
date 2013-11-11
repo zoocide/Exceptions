@@ -5,7 +5,7 @@ use lib '../lib';
 use Test::More tests => 13;
 
 BEGIN{
-  use_ok('Exceptions');
+  use_ok('Exceptions::Functions');
 }
 
 my ($e, $c);

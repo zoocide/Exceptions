@@ -1,4 +1,6 @@
-Revision history for Perl extension Exceptions.
+Revision history for Perl extension Exceptions::Functions.
 
 0.3.2:
 - "catch {} 'Exception'" instead of "catch {} 'Exceptions::Exception'"
+0.4.0:
+- package Exceptions renamed to Exceptions::Functions
