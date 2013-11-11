@@ -3,6 +3,7 @@ use 5.00008;
 use base qw(Exporter);
 use Exceptions::Exception;
 use Exceptions::List;
+use Carp;
 our @EXPORT;
 @EXPORT = qw(try throw catch exception2string string2exception make_exlist);
 
@@ -52,7 +53,7 @@ Another implementation of exceptions.
 
 sub throw
 {
-  die $@  if !@_;
+  croak $@  if !@_;
   die $_[0] if ref $_[0];
   die +('Exceptions::'.(shift))->new(@_);
 }
