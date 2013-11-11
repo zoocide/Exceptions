@@ -76,7 +76,9 @@ sub try (&;$)
       }
       if ($ret_sub){
         $@ = $e;
-        return &$ret_sub($e);
+        my $res = &$ret_sub($e);
+        undef $@;
+        return $res;
       }
     }
     die $e;
