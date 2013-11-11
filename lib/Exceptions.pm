@@ -11,11 +11,7 @@ our $VERSION = '0.3.2';
 
 =head1 NAME
 
-Exceptions
-
-=head1 ABSTRACT
-
-Another implementation of exceptions.
+Exceptions - Another implementation of exceptions.
 
 =head1 SYNOPSIS
 
@@ -201,7 +197,8 @@ If exists 'catch' with suitable argument it is used. Otherwise exception will be
 
 Use it only as exception processor.
   catch {}; - catch exception of any type including string exceptions.
-  catch {} 'Exceptions::MyException'; - catch only exception of 'Exceptions::MyException' type.
+  catch {} 'MyException'; - catch only exception of 'Exceptions::MyException' type.
+  DEPRECATED: catch {} 'Exceptions::MyException'; - catch only exception of 'Exceptions::MyException' type.
 
 =item exception2string
 
