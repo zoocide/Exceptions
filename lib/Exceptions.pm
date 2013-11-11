@@ -7,7 +7,7 @@ use Carp;
 our @EXPORT;
 @EXPORT = qw(try throw catch exception2string string2exception make_exlist);
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.3.2';
 
 =head1 NAME
 
@@ -21,6 +21,24 @@ Another implementation of exceptions.
 
   use Exceptions;
 
+  #------------------#
+  try{
+    try{
+      die "ERROR\n";
+    }
+    catch{
+      print "catch 1\n";
+    } 'Exception';
+
+    print "skipped\n";
+  }
+  catch{
+    print "catch 2\n";
+  };
+
+  # output: |catch 2
+
+  #------------------#
   try {
     ## do something ##
     ...
@@ -32,15 +50,16 @@ Another implementation of exceptions.
   }
   catch {
     ## catch exception of 'Exceptions::MyException' type ##
-  } 'Exceptions::MyException',
+  } 'MyException',
   catch {
     ## catch exception of 'Exceptions::Exception' type ##
     my $msg = $_[0]->msg;    ##< obtain message from exception
-  } 'Exceptions::Exception',
+  } 'Exception',
   catch {
-    ## catch all exceptions ##
+    ## catch all other exceptions ##
   };
 
+  #------------------#
   try{
     ## do something ##
   }
@@ -48,6 +67,30 @@ Another implementation of exceptions.
   catch{
     print $_[0];     ##< all exceptions prints normally
   };
+
+  #------------------#
+  try{
+    die "ERROR occured\n";
+  }
+  string2exception
+  catch{
+    ## catch ERROR ##
+  } 'Exception';
+
+  #------------------#
+  try{
+    die "can`t open file\n";
+  }
+  string2exception  # convert strings to Exceptions::Exception
+  make_exlist       # if $@ is not an Exceptions::List, then $@ = Exceptions::List->new($@)
+  catch{
+    ## now $@ is array of exceptions ##
+    unshift @{$@}, Exceptions::Exception->new("cannot proceed:");
+      # print $@    =>  |cannot proceed:
+      #                 |can`t open file
+
+    throw         # die $@
+  } 'List';
 
 =cut
 
@@ -90,6 +133,8 @@ sub catch (&;$;$)
 {
   my $type = ($_[1] && !ref $_[1]) ? $_[1] : '';
   my $ret  = ref $_[1] ? $_[1] : (ref $_[2] ? $_[2] : []);
+
+  $type = 'Exceptions::'.$type if $type && index $type, 'Exceptions::';
 
   unshift @$ret, [$type, $_[0]];
   $ret
