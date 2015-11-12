@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use lib '../lib';
-use Test::More tests => 13;
+use Test::More tests => 15;
 
 BEGIN{
   use_ok('Exceptions');
@@ -69,6 +69,22 @@ eval{
 ok(!$e);
 ok(!$@);
 is($c, 1);
+
+##-------------------##
+## trim_location ##
+$e = undef;
+my $msg = 'I stay at home';
+my $msg2 = 'oops';
+eval{
+  try { die $msg; }
+  string2exception
+  catch {
+    $@->trim_location;
+    $msg2 = $@->msg;
+  };
+};
+ok(!$e);
+is($msg2, $msg);
 
 ##-------------------##
 ## try; throw Exception; catch; ##
