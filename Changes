@@ -1,4 +1,10 @@
 Revision history for Perl extension Exceptions.
 
+0.3.3:
+  + add method Exceptions::Exception::trim_location.
+  + add tests.
+  + fix documentation.
+  + fix Makefile.PL
+
 0.3.2:
-- "catch {} 'Exception'" instead of "catch {} 'Exceptions::Exception'"
+  + "catch {} 'Exception'" instead of "catch {} 'Exceptions::Exception'"
